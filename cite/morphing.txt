@@ -1,0 +1,13 @@
+@article{DBLP:journals/corr/abs-2012-04553,
+  author    = {Kasra Jamshidi and Keval Vora},
+  title     = {Pattern Morphing for Efficient Graph Mining},
+  journal   = {CoRR},
+  volume    = {abs/2012.04553},
+  year      = {2020},
+  url       = {https://arxiv.org/abs/2012.04553},
+  eprinttype = {arXiv},
+  eprint    = {2012.04553},
+  timestamp = {Wed, 09 Dec 2020 15:29:05 +0100},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-2012-04553.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
