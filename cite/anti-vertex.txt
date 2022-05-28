@@ -1,0 +1,15 @@
+@inproceedings{10.1145/3534540.3534690,
+  author = {Jamshidi, Kasra and Mariappan, Mugilan and Vora, Keval},
+  title = {Anti-Vertex for Neighborhood Constraints in Subgraph Queries},
+  year = {2022},
+  isbn = {9781450393843},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3534540.3534690},
+  doi = {10.1145/3534540.3534690},
+  booktitle = {Proceedings of the 5th ACM SIGMOD Joint International Workshop on Graph Data Management Experiences &amp; Systems (GRADES) and Network Data Analytics (NDA)},
+  articleno = {5},
+  numpages = {9},
+  location = {Philadelphia, Pennsylvania},
+  series = {GRADES-NDA '22}
+}
