@@ -35,10 +35,10 @@ hr::after{
 }
 
 img#portrait {
-  border-radius: 50%;
+  border-radius: 5px;
   border: 1px solid var(--bg);
   display: block;
-  height: 150px;
+  max-height: 250px;
   margin: 0 auto;
 }
 
@@ -103,46 +103,23 @@ header#title-block-header > .date {
   align-items: flex-start;
 }
 
-main {
-  flex-basis: calc(100% - 100px);
-  flex-grow: 1;
-}
-
-main > h1:nth-child(1) {
-}
-
-.sidebar {
-  flex-basis: 100px;
-  flex-grow: 1;
-  top: 0;
-  position: sticky;
-  text-align: right;
-}
-
-
-.sidebar.header-compensate > nav {
-  margin-top: 3em;
-}
-
 .sidebar > nav {
   display: flex;
+  line-height: 1.15;
   flex-flow: row wrap;
   align-items: stretch;
   align-content: stretch;
-  justify-content: flex-end;
-  line-height: 1.15;
-  border-right: 1px solid var(--light);
-  margin-right: .5em;
-  padding-right: .5em;
+  justify-content: space-around;
+  margin: 0 auto;
+  max-width: 350px;
 }
 
-.sidebar > nav > hr {
-  flex-basis: 100px;
-}
-
-.sidebar > nav > a {
-  flex-basis: 100px;
+.sidebar > nav > a,
+.sidebar > nav > p {
   text-transform: lowercase;
+}
+.sidebar > nav > p {
+  text-decoration: underline;
 }
 
 .sidebar > nav > a,
@@ -156,12 +133,42 @@ main > h1:nth-child(1) {
   color: var(--text);
 }
 
+
+@media only screen and (min-width: 800px) {
+main {
+  flex-basis: calc(100% - 100px);
+  flex-grow: 1;
+}
+
+.sidebar {
+  flex-basis: 100px;
+  flex-grow: 1;
+  top: 0;
+  position: sticky;
+  text-align: right;
+}
+
+.sidebar.header-compensate > nav {
+  margin-top: 3em;
+}
+
+.sidebar > nav {
+  border-right: 1px solid var(--light);
+  margin-right: .5em;
+  padding-right: .5em;
+  justify-content: flex-end;
+}
+
+.sidebar > nav > hr,
+.sidebar > nav > a,
 .sidebar > nav > p {
-  text-decoration: underline;
+  flex-basis: 100px;
+}
+
+.sidebar > nav > p {
   padding: 0;
   margin: 0;
-  flex-basis: 100px;
-  text-transform: lowercase;
+}
 }
 
 nav.dated-list {
@@ -201,3 +208,16 @@ blockquote {
 .citation > :not(.title) {
   font-size: 0.9em;
 }
+
+
+@media only screen and (max-width: 800px) {
+  .sidebar {
+    flex-basis: 100%;
+    text-align: center;
+  }
+
+  .sidebar > nav {
+    border-right: none;
+  }
+}
+
