@@ -23,12 +23,31 @@
   display: flex;
 }
 
-img {
+hr {
+  border: none;
+}
+hr::after{
+  content: '* * *';
+  text-align: center;
+  color: var(--light);
+  font-weight: normal;
+  display: block;
+}
+
+img#portrait {
   border-radius: 50%;
   border: 1px solid var(--bg);
   display: block;
   height: 150px;
   margin: 0 auto;
+}
+
+img {
+  max-width: 100%;
+}
+
+img.plot {
+  border: 1px solid black;
 }
 
 a {
@@ -68,6 +87,14 @@ p {
   margin-top: 0em;
 }
 
+header#title-block-header {
+  max-width: 100%;
+}
+
+header#title-block-header > .date {
+  text-align: center;
+}
+
 .card {
   padding: 1em 0em;
   margin: auto;
@@ -84,7 +111,7 @@ main {
 main > h1:nth-child(1) {
 }
 
-header {
+.sidebar {
   flex-basis: 100px;
   flex-grow: 1;
   top: 0;
@@ -93,11 +120,11 @@ header {
 }
 
 
-header.header-compensate > nav {
+.sidebar.header-compensate > nav {
   margin-top: 3em;
 }
 
-header > nav {
+.sidebar > nav {
   display: flex;
   flex-flow: row wrap;
   align-items: stretch;
@@ -109,27 +136,27 @@ header > nav {
   padding-right: .5em;
 }
 
-header > nav > hr {
+.sidebar > nav > hr {
   flex-basis: 100px;
 }
 
-header > nav > a {
+.sidebar > nav > a {
   flex-basis: 100px;
   text-transform: lowercase;
 }
 
-header > nav > a,
-header > nav > a:visited {
+.sidebar > nav > a,
+.sidebar > nav > a:visited {
   text-decoration: none;
   color: var(--text-light);
 }
 
-header > nav > a:hover,
+.sidebar > nav > a:hover,
 .curr, .curr:visited {
   color: var(--text);
 }
 
-header > nav > p {
+.sidebar > nav > p {
   text-decoration: underline;
   padding: 0;
   margin: 0;
