@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="" />
+  <meta name="dcterms.date" content="2018-01-22" />
+  <title>Factoring Integers With Regular Expressions</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="/main.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+
+<header id="title-block-header">
+<h1 class="title">Factoring Integers With Regular Expressions</h1>
+<p class="author"></p>
+<p class="date">January 22, 2018</p>
+</header>
+<div class='card'>
+<div class='sidebar'>
+<nav>
+  <a href="/">kjamsh</a>
+  <a href="/posts">Posts</a>
+  <a href="mailto:contact@kjamsh.com">Contact</a>
+  <a href="https://github.com/kjamsh">GitHub</a>
+  <a href="/cv.pdf">CV</a>
+</nav>
+</div>
+
+<main>
+<p>Last semester, I was in a crypto class, so I found myself doing a lot
+of googling about primality testing and factoring integers. I stumbled
+upon an interesting regular expression in a <a
+href="https://stackoverflow.com/questions/3329766/how-does-this-regular-expression-work">StackOverflow
+answer</a>. Let’s take a look at it.</p>
+<pre><code>^1?$|^(11+?)\1+$</code></pre>
+<p>This short regex snippet matches against strings containing <em>a
+composite number of <code>1</code>’s</em>. Surely, you have questions.
+If you search the web for primality testing regexes, or this particular
+regex, you will see that others had questions too. I found other
+people’s explanations lacking, so I’ll offer my own.</p>
+<p>This regular expression tries to factor the number of
+<code>1</code>’s in the string: if the only factors are zero, one, or
+the number of <code>1</code>’s, then it fails to match. It does this
+through trial division. It tries dividing by one, then two, then three,
+and so on, until it finds a match or it reaches the number itself.</p>
+<p>Here’s a quick walkthrough with inputs <code>11111</code> and
+<code>111111</code> (5 and 6 <code>1</code>’s, respectively):</p>
+<pre><code>^1?$</code></pre>
+<p>This just matches against zero or one <code>1</code>’s (since neither
+are prime). This doesn’t match <code>11111</code>.</p>
+<pre><code>^(11+?)</code></pre>
+<p>This is where the fun starts. This matches against one <code>1</code>
+and as few more <code>1</code>’s as possible to complete a match.
+Initially, it just matches <code>11</code> in both our inputs. Whatever
+is matched is <em>captured</em> since we put parentheses around it.</p>
+<pre><code>\1+$</code></pre>
+<p>In case you are unfamiliar, <code>\1</code> is called a
+<em>backreference,</em> and it references back to the last thing
+captured, the <code>11</code>. So for <code>111111</code>,
+<code>^(11+?)\1+$</code> matches! There is an initial <code>11</code>
+plus two more <code>11</code>s for a total of 6 <code>1</code>’s. Do you
+see what’s happening? The regex tried to divide 6 by 2 and succeeded, so
+it returns a match.</p>
+<p>This doesn’t match against <code>11111</code> though:
+<code>11 .. 11</code> is missing a <code>1</code> and
+<code>11 .. 11 .. 11</code> has too many <code>1</code>’s. So now the
+regex engine has to backtrack and try again.</p>
+<p>This time <code>^(11+?)</code> matches <code>111</code>, but that’s
+no good either: the only option is <code>111 .. 111</code> which is too
+many <code>1</code>’s again. Next it matches <code>1111</code>, but that
+doesn’t work for the same reason.</p>
+<p>Finally, the engine will give it one last shot by matching the whole
+string: <code>11111</code>, but since it can’t fit it more than once to
+satisfy the <code>\1+</code> bit, it gives up. No match for the prime
+number.</p>
+<hr />
+<p>A regular expression that performs trial division: now you can say
+you’ve seen it all! This should go without saying, but <em>don’t use
+this.</em> Primality testing is already <a
+href="https://rosettacode.org/wiki/Miller–Rabin_primality_test">easy</a>,
+there’s no need to repurpose regex engines to do it inefficiently. It’s
+just a neat trick.</p>
+</main>
+</div>
+</body>
+</html>

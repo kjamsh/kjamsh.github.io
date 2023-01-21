@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="" />
+  <meta name="dcterms.date" content="2019-09-02" />
+  <title>Data Layout and Performance</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="/main.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+
+<header id="title-block-header">
+<h1 class="title">Data Layout and Performance</h1>
+<p class="author"></p>
+<p class="date">September 2, 2019</p>
+</header>
+<div class='card'>
+<div class='sidebar'>
+<nav>
+  <a href="/">kjamsh</a>
+  <a href="/posts">Posts</a>
+  <a href="mailto:contact@kjamsh.com">Contact</a>
+  <a href="https://github.com/kjamsh">GitHub</a>
+  <a href="/cv.pdf">CV</a>
+</nav>
+</div>
+
+<main>
+<p><em>This post is meant as a quick introduction to how data layout in
+memory affects performance for students in CMPT 431/770, but it can be a
+good reminder for anybody doing performance sensitive work. For a more
+comprehensive treatment of memory effects, I would recommend <a
+href="https://en.algorithmica.org/hpc/cpu-cache/">Algorithmica’s HPC
+docs.</a></em></p>
+<h3 id="data-access-patterns">Data Access Patterns</h3>
+<p>An extremely common design decision when implementing high
+performance applications is between Array-of-Structs (AoS) and
+Struct-of-Arrays (SoA). The answer to which you should choose depends on
+your data access pattern.</p>
+<p>Since it is common to process arrays of data sequentially, accessing
+one element of an array causes modern hardware to also prefetch nearby
+memory and load it into the cache. This means you should try to keep the
+data you need to access close together in memory, so that as much of the
+useful data as possible will be prefetched. By the same token, you
+should try to avoid having unnecessary data prefetched and wasting cache
+space.</p>
+<p>Let’s walk through an example. Suppose you are processing an array of
+pixels, which will be displayed on a screen. Each pixel has a value, an
+x-coordinate, and a y-coordinate. You might write a program that looks
+something like this:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Pixel <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> x<span class="op">;</span> <span class="co">// 4 bytes</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> y<span class="op">;</span> <span class="co">// 4 bytes</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> value<span class="op">;</span> <span class="co">// 8 bytes</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>Pixel pixels_array<span class="op">[</span>SIZE<span class="op">];</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> SIZE<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  Pixel p <span class="op">=</span> pixels_array<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  p<span class="op">.</span>x <span class="op">+=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  p<span class="op">.</span>y <span class="op">-=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  p<span class="op">.</span>value <span class="op">*=</span> p<span class="op">.</span>x <span class="op">+</span> p<span class="op">.</span>y <span class="op">*</span> <span class="fl">3.61</span><span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>An instance of <code>Pixel</code> takes 16 bytes in memory, and a
+typical cache line is 64 bytes long. When you loop, at most 4 elements
+from the <code>pixels_array</code> can be loaded into the cache, and
+afterwards you will incur a miss. This is the Array-of-Structs (AoS)
+approach.</p>
+<p>Now consider an alternative design, where the
+<code>pixels_array</code> is broken up into several arrays, one for each
+attribute of a <code>Pixel</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> PixelArray <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> xs<span class="op">[</span>SIZE<span class="op">];</span> <span class="co">// SIZE*4 bytes</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> ys<span class="op">[</span>SIZE<span class="op">];</span> <span class="co">// SIZE*4 bytes</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> values<span class="op">[</span>SIZE<span class="op">];</span> <span class="co">// SIZE*8 bytes</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>PixelArray p<span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> SIZE<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  p<span class="op">.</span>xs<span class="op">[</span>i<span class="op">]</span> <span class="op">+=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  p<span class="op">.</span>ys<span class="op">[</span>i<span class="op">]</span> <span class="op">-=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  p<span class="op">.</span>values<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> p<span class="op">.</span>xs<span class="op">[</span>i<span class="op">]</span> <span class="op">+</span> p<span class="op">.</span>ys<span class="op">[</span>i<span class="op">]</span> <span class="op">*</span> <span class="fl">3.61</span><span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This is the Struct-of-Arrays (SoA) approach. Since arrays are stored
+contiguously in memory, <code>xs[i]</code> will always be at least
+<code>SIZE*4</code> bytes away from <code>ys[i]</code> and
+<code>SIZE*8 + SIZE*4</code> bytes away from <code>values[i]</code>! If
+<code>SIZE*4</code> is larger than 32, then the distance between the
+attributes of a pixel is larger than a cache line, so you’ll incur a
+cache miss on every access. So compared to the Array-of-Structs
+approach, which incurs a cache miss every 4 iterations, Struct-of-Arrays
+incurs multiple cache misses every iteration.</p>
+<p>So Array-of-Structs was the better approach because you needed to
+access all the attributes of a pixel when processing. On the other hand,
+if you only need to update the x-coordinate of a pixel, AoS leads to
+cache inefficiencies. For instance:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> SIZE<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  Pixel p <span class="op">=</span> pixels_array<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  p<span class="op">.</span>x <span class="op">+=</span> i<span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Here, you repeatedly jump past the unused <code>.y</code> and
+<code>.value</code> members of <code>Pixel</code>. In this situation,
+Struct-of-Arrays is preferable.</p>
+<p>Note that the cache analysis above is hugely simplified (e.g. you
+will not get exactly one miss every 4 iterations in the first example).
+You can always run <code>perf -e cache-misses ./myprogram</code> on AoS
+and SoA versions of a program to gauge the difference in cache behaviour
+yourself. The broader points apply though, and cache-friendly programs
+will almost always outperform cache-unfriendly ones.</p>
+<h3 id="false-sharing">False Sharing</h3>
+<p>Suppose we are summing up the values in an extremely large array.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> huge_array<span class="op">[</span>SIZE<span class="op">];</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">long</span> <span class="dt">long</span> <span class="dt">int</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> SIZE<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  sum <span class="op">+=</span> huge_array<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>A simple way to parallelize this program would be to have multiple
+threads compute a local sum of a part of the array, and then combine
+each thread-local sum into a global result:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> huge_array<span class="op">[</span>SIZE<span class="op">];</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> partial_sum<span class="op">(</span><span class="dt">int</span> <span class="op">*</span>partition<span class="op">,</span> <span class="dt">int</span> size<span class="op">,</span> <span class="dt">long</span> <span class="dt">long</span> <span class="dt">int</span> <span class="op">*</span>destination<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>destination <span class="op">+=</span> partition<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="dt">long</span> <span class="dt">long</span> <span class="dt">int</span> thread_sums<span class="op">[</span>n<span class="op">];</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>parallel <span class="cf">for</span> <span class="op">(</span>thread i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> <span class="op">*</span>partition <span class="op">=</span> <span class="op">&amp;</span>huge_array<span class="op">[</span>i<span class="op">*</span>SIZE<span class="op">/</span>n<span class="op">];</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> size <span class="op">=</span> SIZE<span class="op">/</span>n<span class="op">;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  partial_sum<span class="op">(</span>partition<span class="op">,</span> size<span class="op">,</span> <span class="op">&amp;</span>thread_sums<span class="op">[</span>i<span class="op">]);</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="dt">long</span> <span class="dt">long</span> <span class="dt">int</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  sum <span class="op">+=</span> thread_sums<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This program seems fine at first glance, and will run correctly.
+However, it will be extremely slow due to false sharing. The problem is
+that different threads are constantly writing to contiguous elements in
+<code>thread_sums</code>. If a thread running on core A wants to access
+<code>thread_sums[i]</code>, it will be loaded into core A’s cache along
+with other (neighbouring) elements of <code>thread_sums</code>. But then
+if a thread on core B concurrently writes to
+<code>thread_sums[i+1]</code>, core A’s cache line will be invalidated.
+The constant invalidations defeat the purpose of the cache and force all
+the data accesses to go to main memory, which is extremely
+expensive.</p>
+<p>This causes massive performance degradation. Thread-local values that
+are frequently written to should be allocated within threads, never
+contiguously outside a thread’s context.</p>
+<p>The false sharing in the code above can be easily fixed with a local
+variable within the <code>partial_sum</code> function.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> partial_sum<span class="op">(</span><span class="dt">int</span> <span class="op">*</span>partition<span class="op">,</span> <span class="dt">int</span> size<span class="op">,</span> <span class="dt">long</span> <span class="dt">long</span> <span class="dt">int</span> <span class="op">*</span>destination<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">long</span> <span class="dt">long</span> <span class="dt">int</span> local_sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    local_sum <span class="op">+=</span> partition<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>destination <span class="op">=</span> local_sum<span class="op">;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Now, each thread only touches <code>thread_sums</code> once, so we
+don’t have constant cache invalidation throughout the execution.</p>
+</main>
+</div>
+</body>
+</html>
