@@ -1,4 +1,4 @@
-% Hacking LLVM's Vector Types
+% Hacking LLVM's Type System
 %
 % April 15, 2018
 
@@ -26,7 +26,7 @@ While working on a vector of `int`'s (or `long`'s or `char`'s or `short`'s) is n
 
 Well, LLVM IR has support for arbitrary vector types. That means you can write `<5 x i7>` or `<64 x i2>` and your program will work without errors. So how does LLVM generate native code when there are no native instructions defined on these types?
 
-Scalarization. The generated code goes through each element of your vector individually, removes it from the vector, does whatever you want with that element, and then pops it back into another vector. The vector is _scalarized_. The result is a [53KB ASM](https://gitlab.com/lasfter/llvm-type-fudging/snippets/1722768) file yielding a ridiculously slow 32KB binary when compiling a file containing a single function:
+Scalarization. The generated code goes through each element of your vector individually, removes it from the vector, does whatever you want with that element, and then pops it back into another vector. The vector is _scalarized_. The result is a [53KB ASM](add-1bit.s) file yielding a ridiculously slow 32KB binary when compiling a file containing a single function:
 
 ```llvm
 @define add(<128 x i1> %v1, <128 x i1> %v2) {
@@ -37,9 +37,7 @@ Scalarization. The generated code goes through each element of your vector indiv
 
 This is silly! Adding two 1-bit values is just an XOR, and adding two vectors of 1-bit values means just taking the XOR of the vectors. So what we really want to generate is `xor %xmm0, %xmm1`.
 
-One of the best things about LLVM IR, its type system, is getting in the way. It would be really nice to write a compiler that generates IR similar to that above. In fact, a professor of ours is doing [just that](http://parabix.costar.sfu.ca/), but he has a bunch of workarounds in his compiler to deal with the horrible mess non-standard vector types produce. If we could get LLVM to stop producing this mess, the good professor can focus on building his programming language.
-
-Luckily, LLVM is built to be extendible. Compilation works in passes. One pass might find variables you never use and get rid of them. One might find tail-recursive functions and turn them into loops. Another may inline function calls. This way, different people can write different optimizations concurrently without needing to cooperate. What my friends and I did is write a pass to subvert LLVM's type system.
+One of the best things about LLVM IR, its type system, is getting in the way. It would be really nice to write a compiler that generates IR similar to that above. Luckily, LLVM is built to be extendible. Compilation works in passes. One pass might find variables you never use and get rid of them. One might find tail-recursive functions and turn them into loops. Another may inline function calls. This way, different people can write different optimizations concurrently without needing to cooperate. What my friends and I did is write a pass to subvert LLVM's type system.
 
 Given an IR file containing non-standard types (I'll refer to them as illegal types), we produce an IR file containing only standard types (I'll call them legal). This is called type legalization and it comprises one stage of our pass.
 
@@ -78,7 +76,7 @@ Now this generates the ASM we're looking for! And it runs as fast as you can exp
 
 This example was easy though; 1-bit values are not complicated. What happens if your input is multiplying vectors of 4-bit values? Well, you can't just swap in an `xor` and call it a day, but it's not too difficult to come up with algorithms to perform 4-bit multiplication in packed 128-bit registers. There are algorithms for all the main arithmetic operations in fact, in varying performance and complexity.
 
-We built a function that contains our SWAR implementation of multiply for vectors of 4-bit integers and splice in a call to it instead. I won't bore you with the details, if you're interested in the implementation or the algorithms, you can look at the [source](https://gitlab.com/lasfter/llvm-type-fudging) of our project.
+We built a function that contains our SWAR implementation of multiply for vectors of 4-bit integers and splice in a call to it instead. I won't bore you with the details, it's some annoying bit-twiddling.
 
 What I am really excited to show are the results. We benchmarked a very simple program with and without our pass.
 

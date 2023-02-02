@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="" />
   <meta name="dcterms.date" content="2018-04-15" />
-  <title>Hacking LLVM’s Vector Types</title>
+  <title>Hacking LLVM’s Type System</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -29,7 +29,7 @@
 <body>
 
 <header id="title-block-header">
-<h1 class="title">Hacking LLVM’s Vector Types</h1>
+<h1 class="title">Hacking LLVM’s Type System</h1>
 <p class="author"></p>
 <p class="date">April 15, 2018</p>
 </header>
@@ -96,8 +96,7 @@ types?</p>
 <p>Scalarization. The generated code goes through each element of your
 vector individually, removes it from the vector, does whatever you want
 with that element, and then pops it back into another vector. The vector
-is <em>scalarized</em>. The result is a <a
-href="https://gitlab.com/lasfter/llvm-type-fudging/snippets/1722768">53KB
+is <em>scalarized</em>. The result is a <a href="add-1bit.s">53KB
 ASM</a> file yielding a ridiculously slow 32KB binary when compiling a
 file containing a single function:</p>
 <div class="sourceCode" id="cb3"><pre
@@ -110,18 +109,13 @@ vectors of 1-bit values means just taking the XOR of the vectors. So
 what we really want to generate is <code>xor %xmm0, %xmm1</code>.</p>
 <p>One of the best things about LLVM IR, its type system, is getting in
 the way. It would be really nice to write a compiler that generates IR
-similar to that above. In fact, a professor of ours is doing <a
-href="http://parabix.costar.sfu.ca/">just that</a>, but he has a bunch
-of workarounds in his compiler to deal with the horrible mess
-non-standard vector types produce. If we could get LLVM to stop
-producing this mess, the good professor can focus on building his
-programming language.</p>
-<p>Luckily, LLVM is built to be extendible. Compilation works in passes.
-One pass might find variables you never use and get rid of them. One
-might find tail-recursive functions and turn them into loops. Another
-may inline function calls. This way, different people can write
-different optimizations concurrently without needing to cooperate. What
-my friends and I did is write a pass to subvert LLVM’s type system.</p>
+similar to that above. Luckily, LLVM is built to be extendible.
+Compilation works in passes. One pass might find variables you never use
+and get rid of them. One might find tail-recursive functions and turn
+them into loops. Another may inline function calls. This way, different
+people can write different optimizations concurrently without needing to
+cooperate. What my friends and I did is write a pass to subvert LLVM’s
+type system.</p>
 <p>Given an IR file containing non-standard types (I’ll refer to them as
 illegal types), we produce an IR file containing only standard types
 (I’ll call them legal). This is called type legalization and it
@@ -171,10 +165,7 @@ arithmetic operations in fact, in varying performance and
 complexity.</p>
 <p>We built a function that contains our SWAR implementation of multiply
 for vectors of 4-bit integers and splice in a call to it instead. I
-won’t bore you with the details, if you’re interested in the
-implementation or the algorithms, you can look at the <a
-href="https://gitlab.com/lasfter/llvm-type-fudging">source</a> of our
-project.</p>
+won’t bore you with the details, it’s some annoying bit-twiddling.</p>
 <p>What I am really excited to show are the results. We benchmarked a
 very simple program with and without our pass.</p>
 <div class="sourceCode" id="cb7"><pre
