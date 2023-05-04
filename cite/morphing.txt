@@ -2,7 +2,13 @@
   author = {Jamshidi, Kasra and Xu, Guoqing Harry and Vora, Keval},
   title = {Accelerating Graph Mining Systems with Subgraph Morphing},
   year = {2023},
+  isbn = {},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {},
+  doi = {},
   booktitle = {Proceedings of the Eighteenth European Conference on Computer Systems},
+  articleno = {},
   numpages = {18},
   location = {Rome, Italy},
   series = {EuroSys '23}
