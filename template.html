@@ -38,51 +38,51 @@ $for(include-before)$
 $include-before$
 $endfor$
 
+  <main>
+    <nav>
+      <a href="/">kjamsh</a>
+      <a href="/posts">Blog</a>
+      <a href="mailto:contact@kjamsh.com">Contact</a>
+      <a href="/cv-kasra-jamshidi.pdf">CV</a>
+      <a href="https://github.com/kjamsh">GitHub</a>
+      <a href="https://scholar.google.com/citations?user=y8ne7rYAAAAJ&hl=en">Scholar</a>
+    </nav>
+  </main>
+
 $if(title)$
-<header id="title-block-header">
-<h1 class="title">$title$</h1>
+  <main>
+    <h1 class="title">$title$</h1>
 $if(subtitle)$
-<p class="subtitle">$subtitle$</p>
+    <p class="subtitle">$subtitle$</p>
 $endif$
 $for(author)$
-<p class="author">$author$</p>
+    <p class="author">$author$</p>
 $endfor$
 $if(date)$
-<p class="date">$date$</p>
+    <p class="date">$date$</p>
 $endif$
 $if(abstract)$
-<div class="abstract">
-<div class="abstract-title">$abstract-title$</div>
+    <div class="abstract">
+      <div class="abstract-title">$abstract-title$</div>
 $abstract$
-</div>
+    </div>
 $endif$
-</header>
+  </main>
 $endif$
-<div class='card'>
-<div class='sidebar'>
-<nav>
-  <a href="/">kjamsh</a>
-  <a href="/posts">Posts</a>
-  <a href="/cv-kasra-jamshidi.pdf">CV</a>
-  <a href="mailto:contact@kjamsh.com">Contact</a>
-  <a href="https://github.com/kjamsh">GitHub</a>
-</nav>
-</div>
 
-<main>
+  <main class='blog-post'>
 $if(toc)$
-<nav id="$idprefix$TOC" role="doc-toc">
+    <nav id="$idprefix$TOC" role="doc-toc">
 $if(toc-title)$
-<h2 id="$idprefix$toc-title">$toc-title$</h2>
+      <h2 id="$idprefix$toc-title">$toc-title$</h2>
 $endif$
 $table-of-contents$
-</nav>
+    </nav>
 $endif$
 $body$
 $for(include-after)$
 $include-after$
 $endfor$
-</main>
-</div>
+  </main>
 </body>
 </html>

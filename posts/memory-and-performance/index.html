@@ -28,23 +28,24 @@
 </head>
 <body>
 
-<header id="title-block-header">
-<h1 class="title">Data Layout and Performance</h1>
-<p class="author"></p>
-<p class="date">September 2, 2019</p>
-</header>
-<div class='card'>
-<div class='sidebar'>
-<nav>
-  <a href="/">kjamsh</a>
-  <a href="/posts">Posts</a>
-  <a href="/cv-kasra-jamshidi.pdf">CV</a>
-  <a href="mailto:contact@kjamsh.com">Contact</a>
-  <a href="https://github.com/kjamsh">GitHub</a>
-</nav>
-</div>
+  <main>
+    <nav>
+      <a href="/">kjamsh</a>
+      <a href="/posts">Blog</a>
+      <a href="mailto:contact@kjamsh.com">Contact</a>
+      <a href="/cv-kasra-jamshidi.pdf">CV</a>
+      <a href="https://github.com/kjamsh">GitHub</a>
+      <a href="https://scholar.google.com/citations?user=y8ne7rYAAAAJ&hl=en">Scholar</a>
+    </nav>
+  </main>
 
-<main>
+  <main>
+    <h1 class="title">Data Layout and Performance</h1>
+    <p class="author"></p>
+    <p class="date">September 2, 2019</p>
+  </main>
+
+  <main class='blog-post'>
 <p><em>This post is meant as a quick introduction to how data layout in
 memory affects performance for students in CMPT 431/770, but it can be a
 good reminder for anybody doing performance sensitive work. For a more
@@ -188,7 +189,6 @@ class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#c
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>Now, each thread only touches <code>thread_sums</code> once, so we
 don’t have constant cache invalidation throughout the execution.</p>
-</main>
-</div>
+  </main>
 </body>
 </html>

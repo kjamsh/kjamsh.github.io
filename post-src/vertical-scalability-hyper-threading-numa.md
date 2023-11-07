@@ -1,4 +1,4 @@
-% Vertical Scalability:<br> Hyper-Threading &amp; NUMA
+% Vertical Scalability: Hyper-Threading &amp; NUMA
 %
 % June 12, 2020
 

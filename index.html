@@ -7,104 +7,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <div class='card'>
-        <div class='sidebar'>
+    <main>
+      <div id='portrait-container'>
+        <img alt="A photo of me standing in front of Crater Lake in Oregon at sunrise." id='portrait' src="me.jpg">
+        <div id='portrait-behind'></div>
+      </div>
+
+      <nav>
+        <a class='curr'>kjamsh</p>
+        <a href="/posts">Blog</a>
+        <a href="mailto:contact@kjamsh.com">Contact</a>
+        <a href="/cv-kasra-jamshidi.pdf">CV</a>
+        <a href="https://github.com/kjamsh">GitHub</a>
+        <a href="https://scholar.google.com/citations?user=y8ne7rYAAAAJ&hl=en">Scholar</a>
+      </nav>
+
+      <div id="about">
+        <h1>Kasra Jamshidi</h1>
+        <p>
+        I make software systems efficient, scalable, and usable.
+        My specialty is translating application semantics into concrete performance gains in large-scale graph systems through intelligent use of novel processing and programming models.
+        <a href="mailto:contact@kjamsh.com">Reach out</a> if you want creative solutions to your scalability bottlenecks.
+        </p>
+
+        <p>
+          I pioneered pattern-aware graph mining with <a href="https://github.com/pdclab/peregrine">Peregrine</a>, a fast, programmable data mining engine for massive graphs which analyzes user queries to aggressively optimize execution.
+        </p>
+
+        <p>
+          You can find my talks on <a href="https://youtube.com/playlist?list=PLJ8ZOptG1_4y4Zs8GFIjHvloV-y0cMXYE">YouTube</a>.
+        </p>
+      </div>
+    </main>
+
+    <!--div class='wave'></div-->
+
+    <main>
+      <div id='publications'>
+        <h2>Publications</h2>
+
+        <div class='paper'>
+          <div class='citation'>
+            <div class='title'>Exploiting Cross-Task Dependencies in Graph Mining with Containment Constraints</div>
+            <div class='short-venue'>EuroSys '24</div>
+            <div class='authors'>Joanna&nbsp;Che, <strong>Kasra&nbsp;Jamshidi</strong>, Keval&nbsp;Vora</div>
+          </div>
           <nav>
-            <p>kjamsh</p>
-            <a href="/posts">Posts</a>
-            <a href="/cv-kasra-jamshidi.pdf">CV</a>
-            <a href="mailto:contact@kjamsh.com">Contact</a>
-            <a href="https://github.com/kjamsh">GitHub</a>
           </nav>
         </div>
-        <main>
-          <img id='portrait' src="me.jpg">
-          <div id="about">
-            <p>
-            Hi, I'm Kasra.
-            </p>
 
-            <p>
-            I make software systems efficient, scalable, and usable.
-            <a href="mailto:contact@kjamsh.com">Reach out</a> if you want my help with better abstractions and macro-optimizations.
-            </p>
 
-            <p>
-              I pioneered pattern-aware graph mining with <a href="https://github.com/pdclab/peregrine">Peregrine</a>, a fast, programmable data mining engine for massive graphs which analyzes user queries to aggressively optimize execution.
-            </p>
-
-            <p>
-            You can find my talks on <a href="https://youtube.com/playlist?list=PLJ8ZOptG1_4y4Zs8GFIjHvloV-y0cMXYE">YouTube</a>.
-            </p>
+        <div class='paper'>
+          <div class='citation'>
+            <div class='title'>Accelerating Graph Mining Systems with Subgraph Morphing</div>
+            <div class='short-venue'>EuroSys '23</div>
+            <div class='authors'><strong>Kasra&nbsp;Jamshidi</strong>, Guoqing&nbsp;Harry&nbsp;Xu, Keval&nbsp;Vora</div>
           </div>
-          <div id='publications'>
-            <h3>Publications</h3>
-
-            <div class='paper'>
-              <div class='citation'>
-                <div class='title'>Exploiting Cross-Task Dependencies in Graph Mining with Containment Constraints</div>
-                <div class='authors'>Joanna&nbsp;Che, <strong>Kasra&nbsp;Jamshidi</strong>, Keval&nbsp;Vora</div>
-                <div class='venue'>In Proceedings of the Nineteenth European Conference on Computer Systems, 2024</div>
-              </div>
-              <nav>
-              </nav>
-            </div>
+          <nav>
+            <a href="papers/morphing.pdf">paper</a>
+            <a href="cite/morphing.txt">cite</a>
+          </nav>
+        </div>
 
 
-            <div class='paper'>
-              <div class='citation'>
-                <div class='title'>Accelerating Graph Mining Systems with Subgraph Morphing</div>
-                <div class='authors'><strong>Kasra&nbsp;Jamshidi</strong>, Guoqing&nbsp;Harry&nbsp;Xu, Keval&nbsp;Vora</div>
-                <div class='venue'>In Proceedings of the Eighteenth European Conference on Computer Systems, 2023</div>
-              </div>
-              <nav>
-                <a href="papers/morphing.pdf">paper</a>
-                <a href="cite/morphing.txt">cite</a>
-              </nav>
-            </div>
-
-
-            <div class='paper'>
-              <div class='citation'>
-                <div class='title'>Anti-Vertex For Neighborhood Constraints In Subgraph Queries</div>
-                <div class='authors'><strong>Kasra&nbsp;Jamshidi</strong>, Mugilan&nbsp;Mariappan, Keval&nbsp;Vora</div>
-                <div class='venue'>GRADES-NDA Workshop, 2022</div>
-              </div>
-              <nav>
-                <a href="papers/anti-vertex.pdf">paper</a>
-                <a href="cite/anti-vertex.txt">cite</a>
-                <a href="https://www.youtube.com/watch?v=0gb_rlIDnJQ">video</a>
-              </nav>
-            </div>
-
-            <div class='paper'>
-              <div class='citation'>
-                <div class='title'>A Deeper Dive into Pattern-Aware Subgraph Exploration with Peregrine</div>
-                <div class='authors'><strong>Kasra&nbsp;Jamshidi</strong>, Keval&nbsp;Vora</div>
-                <div class='venue'>SIGOPS Operating Systems Review, Volume 55, 2021</div>
-              </div>
-              <nav>
-                <a href="papers/peregrine-osr21.pdf">paper</a>
-                <a href="cite/peregrine-osr21.txt">cite</a>
-                <a href="https://github.com/pdclab/peregrine">github</a>
-              </nav>
-            </div>
-
-            <div class='paper'>
-              <div class='citation'>
-                <div class='title'>Peregrine: A Pattern-Aware Graph Mining System</div>
-                <div class='authors'><strong>Kasra Jamshidi</strong>, Rakesh&nbsp;Mahadasa, Keval&nbsp;Vora</div>
-                <div class='venue'>In Proceedings of the Fifteenth European Conference on Computer Systems, 2020</div>
-              </div>
-              <nav>
-                <a href="papers/peregrine.pdf">paper</a>
-                <a href="cite/peregrine.txt">cite</a>
-                <a href="https://github.com/pdclab/peregrine">github</a>
-                <a href="https://www.youtube.com/watch?v=o3BaYgeR0nQ">video</a>
-              </nav>
-            </div>
+        <div class='paper'>
+          <div class='citation'>
+            <div class='title'>Anti-Vertex For Neighborhood Constraints In Subgraph Queries</div>
+            <div class='short-venue'>GRADES-NDA '22</div>
+            <div class='authors'><strong>Kasra&nbsp;Jamshidi</strong>, Mugilan&nbsp;Mariappan, Keval&nbsp;Vora</div>
           </div>
-        </main>
-    </div>
+          <nav>
+            <a href="papers/anti-vertex.pdf">paper</a>
+            <a href="cite/anti-vertex.txt">cite</a>
+            <a href="https://www.youtube.com/watch?v=0gb_rlIDnJQ">video</a>
+          </nav>
+        </div>
+
+        <div class='paper'>
+          <div class='citation'>
+            <div class='title'>A Deeper Dive into Pattern-Aware Subgraph Exploration with Peregrine</div>
+            <div class='short-venue'>SIGOPS OSR '21</div>
+            <div class='authors'><strong>Kasra&nbsp;Jamshidi</strong>, Keval&nbsp;Vora</div>
+          </div>
+          <nav>
+            <a href="papers/peregrine-osr21.pdf">paper</a>
+            <a href="cite/peregrine-osr21.txt">cite</a>
+            <a href="https://github.com/pdclab/peregrine">github</a>
+          </nav>
+        </div>
+
+        <div class='paper'>
+          <div class='citation'>
+            <div class='title'>Peregrine: A Pattern-Aware Graph Mining System</div>
+            <div class='short-venue'>EuroSys '20</div>
+            <div class='authors'><strong>Kasra Jamshidi</strong>, Rakesh&nbsp;Mahadasa, Keval&nbsp;Vora</div>
+          </div>
+          <nav>
+            <a href="papers/peregrine.pdf">paper</a>
+            <a href="cite/peregrine.txt">cite</a>
+            <a href="https://github.com/pdclab/peregrine">github</a>
+            <a href="https://www.youtube.com/watch?v=o3BaYgeR0nQ">video</a>
+          </nav>
+        </div>
+      </div>
+    </main>
   </body>
 </html>
