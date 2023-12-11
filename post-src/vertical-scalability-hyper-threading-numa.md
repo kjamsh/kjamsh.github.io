@@ -2,7 +2,7 @@
 %
 % June 12, 2020
 
-_Vertical scalability_ measures how your system speeds up as you beef up the machines it runs on. We're going to look at how [Peregrine](https://github.com/pdclab/peregrine)&mdash;a single-machine graph mining system&mdash;scales, and try to learn as much as we can from it.
+_Vertical scalability_ measures how your system speeds up as you beef up the machines it runs on. We're going to look at how [Peregrine](https://github.com/pdclab/peregrine)&mdash;a parallel graph mining system&mdash;scales, and try to learn as much as we can from it.
 
 The plots and analysis below is all mostly present in the Peregrine paper as well.
 Don't worry, you don't have to read the paper to follow along :)
