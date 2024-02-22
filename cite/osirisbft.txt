@@ -1,0 +1,17 @@
+@inproceedings{10.1145/3627535.3638468,
+author = {Jamshidi, Kasra and Vora, Keval},
+title = {OsirisBFT: Say No to Task Replication for Scalable Byzantine Fault Tolerant Analytics},
+year = {2024},
+isbn = {9798400704352},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3627535.3638468},
+doi = {10.1145/3627535.3638468},
+abstract = {We present a verification-based Byzantine Fault Tolerant processing system, called OsirisBFT, for distributed task-parallel applications. OsirisBFT treats computation tasks differently from state update tasks, allowing the application to scale independently from number of expected failures. OsirisBFT captures application-specific verification semantics via generic verification operators and employs lightweight verification strategies with little coordination during graceful execution. Evaluation across multiple applications and workloads shows that OsirisBFT delivers high processing throughput and scalability compared to replicated processing. Importantly, the scalable nature of OsirisBFT enables it to reduce the performance gap compared to baseline with no fault tolerance by simply scaling out.},
+booktitle = {Proceedings of the 29th ACM SIGPLAN Annual Symposium on Principles and Practice of Parallel Programming},
+pages = {94–108},
+numpages = {15},
+keywords = {distributed computing, byzantine fault tolerance, data processing systems, resilient systems},
+location = {<conf-loc>, <city>Edinburgh</city>, <country>United Kingdom</country>, </conf-loc>},
+series = {PPoPP '24}
+}
